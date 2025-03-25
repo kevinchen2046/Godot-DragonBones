@@ -2,6 +2,7 @@
 
 #include "dragonbones_armature.h"
 
+#include "wrappers/GDBitmap.h"
 #include "wrappers/GDDisplay.h"
 #include "wrappers/GDMesh.h"
 #include "wrappers/GDTextureAtlasData.h"
@@ -178,9 +179,9 @@ void Slot_GD::_updateFrame() {
 	if (_displayIndex >= 0 && _display != nullptr && currentTextureData != nullptr) {
 		const auto atlas = currentTextureData->getParent();
 		const auto &region = currentTextureData->region;
-		auto frameDisplay = static_cast<GDMesh *>(_renderDisplay);
 
 		if (currentVerticesData != nullptr) {
+			auto frameDisplay = static_cast<GDMesh *>(_renderDisplay);
 			// Mesh.
 			const auto &deformVertices = _deformVertices->vertices;
 			const auto hasFFD = !deformVertices.empty();
@@ -228,44 +229,48 @@ void Slot_GD::_updateFrame() {
 			_textureScale = 1.0f;
 			_identityTransform();
 		} else {
+			auto frameDisplay = static_cast<GDBitmap *>(_renderDisplay);
+			frameDisplay->textureData = currentTextureData;
 			// Normal texture
-			frameDisplay->indices.resize(6);
-			frameDisplay->verticesColor.resize(4);
-			frameDisplay->verticesUV.resize(4);
-			frameDisplay->verticesPos.resize(4);
-			auto indices_ptr = frameDisplay->indices.ptrw();
-			auto verticesColor_ptr = frameDisplay->verticesColor.ptrw();
-			auto verticesUV_ptr = frameDisplay->verticesUV.ptrw();
-			auto verticesPos_ptr = frameDisplay->verticesPos.ptrw();
+			// frameDisplay->indices.resize(6);
+			// frameDisplay->verticesColor.resize(4);
+			// frameDisplay->verticesUV.resize(4);
+			// frameDisplay->verticesPos.resize(4);
+			// auto indices_ptr = frameDisplay->indices.ptrw();
+			// auto verticesColor_ptr = frameDisplay->verticesColor.ptrw();
+			// auto verticesUV_ptr = frameDisplay->verticesUV.ptrw();
+			// auto verticesPos_ptr = frameDisplay->verticesPos.ptrw();
 
-			indices_ptr[0] = 0;
-			indices_ptr[1] = 1;
-			indices_ptr[2] = 2;
-			indices_ptr[3] = 2;
-			indices_ptr[4] = 3;
-			indices_ptr[5] = 0;
+			// indices_ptr[0] = 0;
+			// indices_ptr[1] = 1;
+			// indices_ptr[2] = 2;
+			// indices_ptr[3] = 2;
+			// indices_ptr[4] = 3;
+			// indices_ptr[5] = 0;
 
 			const auto scale = currentTextureData->parent->scale * _armature->_armatureData->scale;
 			const auto height = (currentTextureData->rotated ? region.width : region.height) * scale / 2.f;
 			const auto width = (currentTextureData->rotated ? region.height : region.width) * scale / 2.f;
 
-			verticesColor_ptr[0] = Color(1, 1, 1, 1);
-			verticesColor_ptr[1] = Color(1, 1, 1, 1);
-			verticesColor_ptr[2] = Color(1, 1, 1, 1);
-			verticesColor_ptr[3] = Color(1, 1, 1, 1);
+			// verticesColor_ptr[0] = Color(1, 1, 1, 1);
+			// verticesColor_ptr[1] = Color(1, 1, 1, 1);
+			// verticesColor_ptr[2] = Color(1, 1, 1, 1);
+			// verticesColor_ptr[3] = Color(1, 1, 1, 1);
 
-			verticesPos_ptr[3] = Vector2(-width, -height);
-			verticesPos_ptr[2] = Vector2(width, -height);
-			verticesPos_ptr[1] = Vector2(width, height);
-			verticesPos_ptr[0] = Vector2(-width, height);
+			// verticesPos_ptr[3] = Vector2(-width, -height);
+			// verticesPos_ptr[2] = Vector2(width, -height);
+			// verticesPos_ptr[1] = Vector2(width, height);
+			// verticesPos_ptr[0] = Vector2(-width, height);
 
-			__get_uv_pt(verticesUV_ptr[0], currentTextureData->rotated, 0, 0, region, atlas);
-			__get_uv_pt(verticesUV_ptr[1], currentTextureData->rotated, 1.f, 0, region, atlas);
-			__get_uv_pt(verticesUV_ptr[2], currentTextureData->rotated, 1.f, 1.f, region, atlas);
-			__get_uv_pt(verticesUV_ptr[3], currentTextureData->rotated, 0, 1.f, region, atlas);
+			// __get_uv_pt(verticesUV_ptr[0], currentTextureData->rotated, 0, 0, region, atlas);
+			// __get_uv_pt(verticesUV_ptr[1], currentTextureData->rotated, 1.f, 0, region, atlas);
+			// __get_uv_pt(verticesUV_ptr[2], currentTextureData->rotated, 1.f, 1.f, region, atlas);
+			// __get_uv_pt(verticesUV_ptr[3], currentTextureData->rotated, 0, 1.f, region, atlas);
+			// 设置初始位置（中心对齐，与原顶点逻辑一致）
+			// frameDisplay->set_position(Vector2(-width / 2, -height / 2));
 
-			_pivotY = 0;
-			_pivotX = 0;
+			// _pivotY = 0;
+			// _pivotX = 0;
 			_textureScale = scale;
 			_identityTransform();
 		}
@@ -382,15 +387,26 @@ void Slot_GD::_updateTransform() {
 		pos.x = globalTransformMatrix.tx - (globalTransformMatrix.a * anchorPoint.x - globalTransformMatrix.c * anchorPoint.y);
 		pos.y = globalTransformMatrix.ty - (globalTransformMatrix.b * anchorPoint.x - globalTransformMatrix.d * anchorPoint.y);
 	}
-
-	Transform2D matrix{
-		globalTransformMatrix.a * _textureScale,
-		globalTransformMatrix.b * _textureScale,
-		-globalTransformMatrix.c * _textureScale,
-		-globalTransformMatrix.d * _textureScale,
-		pos.x * _textureScale,
-		pos.y * _textureScale
-	};
+	Transform2D matrix;
+	if (((void *)_renderDisplay) == _rawDisplay) {
+		matrix = {
+			globalTransformMatrix.a * _textureScale,
+			globalTransformMatrix.b * _textureScale,
+			globalTransformMatrix.c * _textureScale,
+			globalTransformMatrix.d * _textureScale,
+			pos.x * _textureScale,
+			pos.y * _textureScale
+		};
+	} else {
+		matrix = {
+			globalTransformMatrix.a * _textureScale,
+			globalTransformMatrix.b * _textureScale,
+			-globalTransformMatrix.c * _textureScale,
+			-globalTransformMatrix.d * _textureScale,
+			pos.x * _textureScale,
+			pos.y * _textureScale
+		};
+	}
 
 	_renderDisplay->set_transform(matrix);
 	_renderDisplay->queue_redraw();

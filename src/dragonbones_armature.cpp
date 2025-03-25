@@ -4,6 +4,7 @@
 #include "godot_cpp/classes/ref.hpp"
 
 #include "dragonbones.h"
+#include <wrappers/GDBitmap.h>
 #include <wrappers/GDMesh.h>
 
 using namespace godot;
@@ -447,6 +448,14 @@ void DragonBonesArmature::set_slot_display_index(const String &_slot_name, int _
 	}
 
 	getSlot(_slot_name)->setDisplayIndex(_index);
+}
+
+void DragonBonesArmature::set_slot_display_name(const String &_slot_name, const String &_display_name) {
+	if (!has_slot(_slot_name)) {
+		WARN_PRINT("Slot " + _slot_name + " doesn't exist");
+		return;
+	}
+	getSlot(_slot_name)->setDisplayByName(to_std_str(_display_name));
 }
 
 void DragonBonesArmature::set_slot_by_item_name(const String &_slot_name, const String &_item_name) {

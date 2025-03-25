@@ -9,6 +9,7 @@
 #include "godot_cpp/classes/resource_uid.hpp"
 #include "godot_cpp/variant/utility_functions.hpp"
 #include "wrappers/GDMesh.h"
+#include "wrappers/GDBitmap.h"
 #include "wrappers/GDTextureAtlasData.h"
 
 using namespace godot;
@@ -102,7 +103,6 @@ Armature *DragonBonesFactory::_buildArmature(const BuildArmaturePackage &dataPac
 	} else {
 		armatureDisplay = memnew(DragonBonesArmature);
 	}
-
 	armature->init(dataPackage.armature, armatureDisplay, armatureDisplay, _dragonBones);
 	armatureDisplay->set_name(to_gd_str(armature->getName()));
 	return armature;
@@ -110,9 +110,10 @@ Armature *DragonBonesFactory::_buildArmature(const BuildArmaturePackage &dataPac
 
 Slot *DragonBonesFactory::_buildSlot(const BuildArmaturePackage &dataPackage, const SlotData *slotData, Armature *armature) const {
 	auto slot = BaseObject::borrowObject<Slot_GD>();
+	auto rawDisplay = memnew(GDBitmap);
 	auto wrapperDisplay = memnew(GDMesh);
-
-	slot->init(slotData, armature, wrapperDisplay, wrapperDisplay);
+	
+	slot->init(slotData, armature, rawDisplay, wrapperDisplay);
 	slot->update(0);
 
 	// slot->update_display_texture();
@@ -121,6 +122,7 @@ Slot *DragonBonesFactory::_buildSlot(const BuildArmaturePackage &dataPackage, co
 
 	const auto proxy = static_cast<DragonBonesArmature *>(slot->getArmature()->getDisplay());
 	proxy->add_slot(slot->getName(), tree_slot);
+	rawDisplay->set_name(to_gd_str(slot->getName()));
 	wrapperDisplay->set_name(to_gd_str(slot->getName()));
 
 	return slot;

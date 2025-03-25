@@ -184,6 +184,7 @@ public:
      * @internal
      */
     bool _setDisplayIndex(int value, bool isAnimation = false);
+    bool _setDisplayByName(std::string value);
     /**
      * @internal
      */
@@ -330,7 +331,7 @@ public:
         return _displayIndex;
     }
     void setDisplayIndex(int value);
-
+    void setDisplayByName(std::string value);
     /**
      * - The slot name.
      * @see dragonBones.SlotData#name

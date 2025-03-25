@@ -163,6 +163,7 @@ public:
 	Dictionary get_slots();
 
 	void set_slot_display_index(const String &_slot_name, int _index);
+	void set_slot_display_name(const String &_slot_name, const String & _index);
 	void set_slot_by_item_name(const String &_slot_name, const String &_item_name);
 	void set_all_slots_by_item_name(const String &_item_name);
 	int get_slot_display_index(const String &_slot_name);

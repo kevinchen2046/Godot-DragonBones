@@ -2,8 +2,10 @@
 
 #include "dragonBones/model/TextureAtlasData.h"
 
+#include "godot_cpp/classes/atlas_texture.hpp"
 #include "godot_cpp/classes/resource_loader.hpp"
 #include "godot_cpp/classes/texture2d.hpp"
+
 #include "godot_cpp/core/math.hpp"
 #include "godot_cpp/variant/string.hpp"
 
@@ -20,6 +22,7 @@ private:
 	}
 
 public:
+	// Ref<AtlasTexture> display_texture;
 	GDTextureData() { _onClear(); }
 	virtual ~GDTextureData() { _onClear(); }
 
@@ -47,6 +50,10 @@ public:
 
 		return name == p_other.name;
 	}
+
+	// void set_display_texture(Ref<AtlasTexture> p_display_texture){
+	// 	display_texture = p_display_texture;
+	// }
 };
 
 class GDTextureAtlasData : public dragonBones::TextureAtlasData {
@@ -63,7 +70,9 @@ public:
 		return BaseObject::borrowObject<GDTextureData>();
 	}
 
-	void init(const String &p_image_file_path) { display_texture = ResourceLoader::get_singleton()->load(p_image_file_path); }
+	void init(const String &p_image_file_path) {
+		display_texture = ResourceLoader::get_singleton()->load(p_image_file_path);
+	}
 	const Ref<Texture2D> &get_display_texture() const { return display_texture; }
 
 	virtual void _onClear() override {
@@ -77,7 +86,17 @@ public:
 		// 	Rect2i rect(textureData->region.x, textureData->region.y,
 		// 			textureData->rotated ? textureData->region.height : textureData->region.width,
 		// 			textureData->rotated ? textureData->region.width : textureData->region.height);
-		// 	textureData->textureRect = std::move(rect);
+		// 	// textureData->textureRect = std::move(rect);
+		// 	Ref<AtlasTexture> atlas_texture;
+		// 	atlas_texture.instantiate();
+		// 	atlas_texture->set_atlas(display_texture);
+		// 	atlas_texture->set_region(rect);
+		// 	textureData->set_display_texture(atlas_texture);
+		// 	if(atlas_texture.is_valid()){
+		// 		Rect2& region=atlas_texture->get_region();
+		// 		WARN_PRINT("add atlas_texture:"+String::num_int64(region.position.x)+","+String::num_int64(region.position.y)+String::num_int64(region.size.x)+","+String::num_int64(region.size.y));
+		// 	}
+		// 	// textureData->display_texture = atlas_texture;
 		// }
 	}
 

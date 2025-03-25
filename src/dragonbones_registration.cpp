@@ -7,6 +7,7 @@
 #include "editor/dragonbones_editor_plugin.h"
 #endif //TOOLS_ENABLED
 
+#include "wrappers/GDBitmap.h"
 #include "wrappers/GDMesh.h"
 
 #include "godot_cpp/classes/resource_loader.hpp"
@@ -35,6 +36,7 @@ void initialize_gddragonbones_module(godot::ModuleInitializationLevel p_level) {
 	GDREGISTER_CLASS(DragonBonesFactory);
 	GDREGISTER_CLASS(DragonBones);
 
+	GDREGISTER_INTERNAL_CLASS(GDBitmap);
 	GDREGISTER_INTERNAL_CLASS(GDMesh);
 	GDREGISTER_ABSTRACT_CLASS(DragonBonesBone);
 	GDREGISTER_ABSTRACT_CLASS(DragonBonesSlot);

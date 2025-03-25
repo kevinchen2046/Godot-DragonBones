@@ -437,6 +437,32 @@ bool Slot::_setDisplayIndex(int value, bool isAnimation)
     return _displayDirty;
 }
 
+bool Slot::_setDisplayByName(std::string value)
+{
+    int index=-_displayIndex;
+    int count = _displayDatas.size();
+    for (size_t i = 0; i < count; i++)
+    {
+        DisplayData* _display=_displayDatas[i];
+        if(_display->name==value){
+            index=i;
+            break;
+        }
+    }
+    
+    if (_displayIndex == index)
+    {
+        return false;
+    }
+
+    _displayIndex = index;
+    _displayDirty = true;
+
+    _updateDisplayData();
+
+    return _displayDirty;
+}
+
 bool Slot::_setZorder(int value)
 {
     if (_zOrder == value)
@@ -800,6 +826,13 @@ void Slot::setVisible(bool value)
 void Slot::setDisplayIndex(int value)
 {
     if (_setDisplayIndex(value)) 
+    {
+        update(-1);
+    }
+}
+void Slot::setDisplayByName(std::string value)
+{
+    if (_setDisplayByName(value)) 
     {
         update(-1);
     }
